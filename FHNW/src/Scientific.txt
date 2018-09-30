@@ -1,0 +1,39 @@
+First of all, this clarifies why these methods are called default methods and why they must be started off with the keyword default:
+
+Such an implementation is a backup in case a class and none of its superclasses even consider the method, i.e. provide no implementation and are not declaring it as abstract (see Rule #1). Equivalently, a default method of interface X is only used when the class does not also implement an interface Y which extends X and declares the same method (either as default or abstract; see Rule #2).
+
+While these rules are simple, they do not prevent developers from creating complex situations. This post gives an example where the resolution is not trivial to predict and arguments that this feature should be used with care.
+
+The resolution strategy implies several interesting details…
+
+Rule #3, or rather its absence, means that concrete classes must implement each method for which competing default implementations exist. Otherwise the compiler throws an error. If one of the competing implementations is appropriate, the method body can just explicitly call that method.
+
+This also implies that adding default implementations to an interface can lead to compile errors. If a class A implements the unrelated interfaces X and Y and a default method which is already present in X is added to Y, class A will not compile anymore.
+
+What happens if A, X and Y are not compiled together and the JVM stumbles upon this situation? Interesting question to which the answer seems somewhat unclear. Looks like the JVM will throw an IncompatibleClassChangeError.
+
+Re-Abstracting Methods
+If an abstract class or interface A declares a method as abstract for which a default implementation exists in some superinterface X, the default implementation of X is overridden. Hence all concrete classes which subtype A must implement the method. This can be used as an effective tool to enforce the reimplementation of inappropriate default implementations.
+
+This technique is used throughout the JDK, e.g. on ConcurrentMap (link) which re-abstracts a number of methods for which Map (link) provides default implementations because these are not thread-safe (search for the term “inappropriate default”).
+
+Note that concrete classes can not explicitly call the overridden default implementation.
+
+Overriding Methods on ‘Object’
+It is not possible for an interface to provide default implementations for the methods in Object. Trying to do so will result in a compile error. Why?
+
+Well first of all, it would be useless. Since every class inherits from Object, Rule #1 clearly implies that those methods would never be called.
+
+But that rule is no law of nature and the expert group could have made an exception. The mail which also contains the rules, Brian Goetz gives many reasons why they didn’t. The one I like best (formatting mine):
+
+At root, the methods from Object — such as toString, equals, and hashCode — are all about the object’s state. But interfaces do not have state; classes have state. These methods belong with the code that owns the object’s state — the class.
+
+Modifiers
+Note that there are a lot of modifiers you can not use on default methods:
+
+the visibility is fixed to public (as on other interface methods)
+the keyword synchronized is forbidden (as on abstract methods)
+the keyword final is forbidden (as on abstract methods)
+Of course these features were requested and comprehensive explanations for their absence exist (e.g. for final and synchronized). The arguments are always similar: This is not what default methods were intended for and introducing those features will result in more complex and error prone language rules and/or code.
+
+You can use static though, which will reduce the need for plural-form utility classes.

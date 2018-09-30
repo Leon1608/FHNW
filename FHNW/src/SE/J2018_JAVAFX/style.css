@@ -1,0 +1,40 @@
+.root{
+	-fx-background-color: #000000;
+}
+
+.label{
+	-fx-text-fill: #ffffff;
+}
+
+.progressBar{
+	-fx-control-inner-background: #e2dede;
+	-fx-accent: #18a060;
+}
+
+.lifeBar{
+	-fx-control-inner-background: #e2dede;
+	-fx-accent: #a00c0c;
+}
+
+.middleBox{
+	-fx-border-width: 9.0;
+	-fx-border-color: #ffffff;
+}
+
+
+.bottomBox{
+	-fx-border-width: 5.0;
+}
+
+.buttonSubmit{
+	-fx-background-color: #18a060;
+	-fx-border-color: #ffffff;
+	-fx-border-width: 4.0;
+	-fx-text-fill: #ffffff;
+	-fx-border-radius: 20;
+	-fx-background-radius: 25;
+}
+
+
+
+
